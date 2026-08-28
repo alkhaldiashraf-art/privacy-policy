@@ -7,7 +7,7 @@
 </head>
 <body>
 <div class="guest-shell">
-    <div class="guest-card" style="text-align:center;">
+    <div class="guest-card text-center">
         <h1>404</h1>
         <p class="text-muted">That page doesn't exist.</p>
         <a class="btn btn-primary" href="/">Go home</a>

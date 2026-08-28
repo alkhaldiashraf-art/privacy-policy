@@ -19,9 +19,9 @@ use App\Core\View;
         <?php foreach ($projects as $project): ?>
             <a class="project-tile" href="/projects/<?= (int) $project['id'] ?>">
                 <div class="card">
-                    <h3 style="margin-bottom:4px;"><?= View::e($project['name']) ?></h3>
+                    <h3 class="mb-xs"><?= View::e($project['name']) ?></h3>
                     <?php if (!empty($project['url'])): ?>
-                        <p class="text-muted" style="margin-bottom:8px;"><?= View::e($project['url']) ?></p>
+                        <p class="text-muted mb-sm"><?= View::e($project['url']) ?></p>
                     <?php endif; ?>
                     <span class="badge badge-<?= View::e($project['role']) ?>"><?= View::e(ucfirst($project['role'])) ?></span>
                 </div>

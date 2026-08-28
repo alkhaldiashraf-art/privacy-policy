@@ -343,6 +343,18 @@ p {
     border-color: var(--color-text-muted);
 }
 
+/* Small layout utilities — kept in this file rather than as inline
+   style="" attributes so they respect the CSP (style-src 'self'). */
+.text-center { text-align: center; }
+.mt-sm { margin-top: 8px; }
+.mt-md { margin-top: 16px; }
+.mb-xs { margin-bottom: 4px; }
+.mb-sm { margin-bottom: 8px; }
+.card-narrow { max-width: 480px; }
+.card-medium { max-width: 560px; }
+.sidebar-project-name { padding: 0 8px 12px; font-weight: 600; }
+.sidebar-logout-form { margin-top: 8px; }
+
 @media (max-width: 860px) {
     .app-shell {
         flex-direction: column;

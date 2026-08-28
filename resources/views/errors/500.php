@@ -7,7 +7,7 @@
 </head>
 <body>
 <div class="guest-shell">
-    <div class="guest-card" style="text-align:center;">
+    <div class="guest-card text-center">
         <h1>Something went wrong</h1>
         <p class="text-muted">We've logged the problem. Reference: <?= htmlspecialchars($errorId ?? '', ENT_QUOTES) ?></p>
         <a class="btn btn-primary" href="/">Go home</a>

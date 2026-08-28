@@ -10,7 +10,7 @@ $canEdit = ProjectMember::canEdit($project['role']);
     <h1>Settings</h1>
 </div>
 
-<div class="card" style="max-width:560px;">
+<div class="card card-medium">
     <h3>General</h3>
     <form method="post" action="/projects/<?= (int) $project['id'] ?>/settings">
         <?= Csrf::field() ?>

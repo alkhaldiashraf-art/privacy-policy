@@ -22,6 +22,6 @@ use App\Core\View;
     </div>
     <button type="submit" class="btn btn-primary btn-block">Sign up</button>
 </form>
-<p class="field-hint" style="margin-top:16px;text-align:center;">
+<p class="field-hint mt-md text-center">
     Already have an account? <a href="/login">Log in</a>
 </p>

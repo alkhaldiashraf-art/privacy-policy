@@ -7,7 +7,7 @@ use App\Core\View;
 <div class="topbar">
     <h1>New project</h1>
 </div>
-<div class="card" style="max-width:480px;">
+<div class="card card-narrow">
     <form method="post" action="/projects">
         <?= Csrf::field() ?>
         <div class="field">

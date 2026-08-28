@@ -20,7 +20,7 @@ $project = $project ?? null;
 
             <?php if ($project): ?>
                 <div class="sidebar-section-label">Project</div>
-                <div style="padding:0 8px 12px;font-weight:600;"><?= View::e($project['name']) ?></div>
+                <div class="sidebar-project-name"><?= View::e($project['name']) ?></div>
             <?php endif; ?>
 
             <div class="sidebar-section-label">Account</div>
@@ -34,7 +34,7 @@ $project = $project ?? null;
 
             <div class="sidebar-footer">
                 <div><?= View::e($user['name'] ?? '') ?></div>
-                <form method="post" action="/logout" style="margin-top:8px;">
+                <form method="post" action="/logout" class="sidebar-logout-form">
                     <?= Csrf::field() ?>
                     <button type="submit" class="btn btn-outline btn-block">Log out</button>
                 </form>
