@@ -52,13 +52,27 @@ locally against a hosting-accessible DB host.
 
 ## 5. Composer dependencies
 
-The project currently has zero runtime dependencies, and `vendor/` (just
+The project has zero third-party runtime dependencies, and `vendor/` (just
 Composer's own autoloader) is committed to the repository, so no
 `composer install` step is required to deploy. If a later phase adds a
-real dependency (e.g. a PDF library for the Trust Center), run
+real third-party dependency (e.g. a PDF library for the Trust Center), run
 `composer install --no-dev --optimize-autoloader` and re-commit `vendor/`
 before deploying to shared hosting without SSH, or run it on the server
 directly if SSH is available.
+
+The scanner does require two standard PHP extensions: `ext-curl` (URL
+scanning and the optional Anthropic API call) and `ext-zip` (extracting
+uploaded project ZIPs). Both are enabled by default on Hostinger's PHP
+builds; verify with `php -m` if a scan fails unexpectedly.
+
+For the upload scanner, also check `upload_max_filesize` and
+`post_max_size` in your hosting's PHP configuration — they must be at
+least 20M for the largest allowed upload to go through; hPanel exposes
+these under Advanced → PHP Configuration on most plans.
+
+To get AI-generated fix prompts instead of the template fallback, set
+`ANTHROPIC_API_KEY` (and optionally `ANTHROPIC_MODEL`) in `.env`. This is
+optional — the scanner works without it.
 
 ## 6. Verify
 

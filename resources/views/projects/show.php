@@ -17,10 +17,10 @@ use App\Core\View;
 </div>
 
 <div class="card empty-state">
-    <h3>Readiness scanning isn't built yet</h3>
+    <h3>Run a scan</h3>
     <p>
-        This is the architecture foundation for SIUGOALS: accounts, projects, membership
-        and settings. The evidence engine, readiness score, and findings drawer are the
-        next phase of the build.
+        Scan this project's live URL, or upload its source code, to get a real,
+        evidence-based report with a ready-to-paste fix prompt for every finding.
     </p>
+    <a class="btn btn-primary" href="/projects/<?= (int) $project['id'] ?>/scan">Go to Scan</a>
 </div>

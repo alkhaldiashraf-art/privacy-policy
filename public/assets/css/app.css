@@ -343,6 +343,122 @@ p {
     border-color: var(--color-text-muted);
 }
 
+/* Scan tool */
+.scan-tabs {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 16px;
+}
+
+.scan-tab {
+    padding: 10px 16px;
+    border: 1px solid var(--color-border);
+    background: var(--color-card);
+    border-radius: var(--radius-control);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    color: var(--color-text-muted);
+}
+
+.scan-tab.active {
+    color: var(--color-text);
+    border-color: var(--color-text);
+}
+
+.scan-history {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+}
+
+.scan-history th, .scan-history td {
+    text-align: left;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.badge-status-completed { background: rgba(53, 180, 158, 0.12); color: #1c7d6c; }
+.badge-status-failed { background: rgba(217, 67, 63, 0.12); color: var(--color-danger); }
+
+.score-row {
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    margin: 16px 0;
+    flex-wrap: wrap;
+}
+
+.score-gauge {
+    display: flex;
+    align-items: baseline;
+    gap: 4px;
+    padding: 12px 20px;
+    border-radius: var(--radius-card);
+    font-family: var(--font-display);
+    background: var(--color-pending);
+}
+
+.score-gauge.score-good { background: rgba(53, 180, 158, 0.15); }
+.score-gauge.score-warn { background: rgba(245, 212, 81, 0.25); }
+.score-gauge.score-bad { background: rgba(217, 67, 63, 0.12); }
+
+.score-number { font-size: 32px; }
+.score-label { font-size: 14px; color: var(--color-text-muted); }
+
+.severity-counts {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.badge-severity-critical { background: var(--color-danger); color: #fff; }
+.badge-severity-high { background: var(--color-danger-soft); color: #fff; }
+.badge-severity-medium { background: var(--color-yellow); color: var(--color-dark); }
+.badge-severity-low { background: var(--color-pending); color: var(--color-text); }
+.badge-severity-info { background: var(--color-pending); color: var(--color-text-muted); }
+
+.badge-source-ai { background: var(--color-dark); color: #fff; }
+.badge-source-template { background: var(--color-pending); color: var(--color-text-muted); }
+
+.finding-card .finding-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+
+.finding-card .finding-head h3 {
+    margin: 0;
+}
+
+.finding-category {
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-muted);
+}
+
+.finding-location {
+    font-family: monospace;
+    font-size: 13px;
+}
+
+.fix-prompt-text {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-control);
+    font-family: monospace;
+    font-size: 13px;
+    background: var(--color-bg);
+    color: var(--color-text);
+    margin-bottom: 10px;
+    resize: vertical;
+}
+
 @media (max-width: 860px) {
     .app-shell {
         flex-direction: column;

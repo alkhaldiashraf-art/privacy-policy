@@ -43,18 +43,44 @@ listed feature is backed by real server-side logic and a real database.
   badges, alerts, empty states) matching the SIUGOALS visual spec
   (off-white/white/dark palette, Inter body font, Anton display font,
   semantic button colors), plus the authenticated sidebar shell.
+- **URL scanner**: from a project's Scan tab, fetch a real live URL
+  (SSRF-hardened: hostnames are resolved and validated as public IPs, and
+  curl is pinned to that exact IP, before every request including
+  redirects) and run real checks — HTTPS/TLS and certificate expiry,
+  security headers (HSTS, CSP, X-Frame-Options, etc.), cookie flags,
+  exposed `.env`/`.git` paths, SEO basics (title/meta description/OG
+  tags), mobile viewport and basic accessibility (alt text, form labels,
+  link text), performance signals (response time, page size,
+  compression, render-blocking scripts), and a handful of common
+  vulnerability signals (exposed stack traces, dangerous CORS, outdated
+  jQuery, password fields on HTTP). Every finding is a genuine match
+  against the real response — nothing here is simulated.
+- **Project code scanner**: upload a `.zip` of a project (or a single
+  source file) and it's scanned with rule-based static analysis for
+  hardcoded secrets/credentials, dangerous PHP/JS patterns (`eval`,
+  SQL built by string concatenation, LFI-prone `include`, unescaped
+  output, `innerHTML` from a variable, tokens in `localStorage`, etc.),
+  and basic mobile/maintainability issues. ZIP extraction is guarded
+  against zip-slip path traversal and zip bombs (size/file-count caps),
+  and extracted files are deleted immediately after the scan.
+- **AI fix prompts**: every finding gets a ready-to-paste fix prompt, plus
+  one comprehensive prompt covering all findings at once. When
+  `ANTHROPIC_API_KEY` is configured, these are genuinely written by the
+  Anthropic API from the real finding data; with no key configured, the
+  scan still runs and prompts fall back to a clearly-labelled
+  deterministic template instead of silently pretending to be AI-written.
 
 ## What is intentionally NOT built yet
 
 Everything else in the full SIUGOALS specification is future work, not a
 missing feature that's been faked in the UI:
 
-- Public (unauthenticated) URL production-audit scanner and its guided
-  questions/report
-- Import-on-signup flow connecting a public scan to a new account
+- Public (unauthenticated) URL production-audit scanner for signed-out
+  visitors, and its guided questions/report; import-on-signup flow
+- GitHub repository scanner (only URL and direct file/ZIP upload exist
+  so far)
 - Evidence engine / readiness checks / readiness score / findings drawer
   / quick questions / recheck engine
-- ZIP project scanner and GitHub repository scanner
 - Trust Center, public trust pages, PDF reports, certificates
 - Runtime SDK, heartbeats, uptime monitoring, error monitoring, session
   replay
