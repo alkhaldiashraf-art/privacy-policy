@@ -1,0 +1,54 @@
+/* SIUGOALS 5.5 workflow additions. Loaded after app.css. */
+.scan-target{display:grid;grid-template-columns:minmax(190px,300px) auto;gap:2px 8px;align-items:center;text-align:left}
+.scan-target>span{grid-column:1/-1;font-size:10px;letter-spacing:.1em;color:var(--muted);font-weight:700}
+.scan-target input{min-width:190px;width:100%;border:1px solid var(--border);border-radius:9px;background:#fff;padding:9px 11px;color:#5e5651;text-overflow:ellipsis}
+.scan-target a{font-size:12px;color:#6d645f}
+.runtime-status-banner{display:flex;align-items:center;gap:12px;padding:11px 14px;margin:0 0 18px;border:1px solid var(--border);border-radius:11px;font-size:13px}
+.runtime-status-banner strong{white-space:nowrap}
+.runtime-status-banner span{color:#675f5a;flex:1}
+.runtime-status-banner a{white-space:nowrap}
+.runtime-status-banner.live{background:var(--teal-soft);border-color:#b9dfd7;color:#187c72}
+.runtime-status-banner.stale{background:#fff7e3;border-color:#ead394;color:#75591b}
+.runtime-connect-state{display:flex;justify-content:center;gap:12px;align-items:center;margin:-5px auto 18px;padding:8px 12px;border:1px solid var(--border);border-radius:999px;width:max-content;max-width:100%;font-size:12px}
+.runtime-connect-state.live{background:var(--teal-soft);border-color:#b9dfd7;color:#187c72}
+.runtime-connect-state.stale{background:#fff7e3;border-color:#ead394;color:#75591b}
+.runtime-connect-state.never{background:#f3efec;color:#776e69}
+.connect-pr-form{margin:20px 0;padding:14px;border:1px solid var(--border);border-radius:11px;background:#fff}
+.connect-pr-form p{display:inline;margin-left:10px}
+.connect-final-actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:17px}
+.connect-final-actions form{margin:0}
+.affected-session-links,.related-source{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin-top:11px;font-size:11px}
+.affected-session-links strong,.related-source strong{width:100%;color:#59514d}
+.affected-session-links a,.related-source span{display:inline-flex;padding:5px 8px;border:1px solid var(--border);border-radius:999px;background:#faf8f6;color:#625a55;text-decoration:none}
+.affected-session-links a:hover{border-color:var(--coral);color:var(--coral)}
+.empty-state.embedded{min-height:330px;margin-top:18px}
+.pill.danger{background:#ffe6e2;color:#b62d24}
+.pill.warning{background:#fff0d0;color:#835d00}
+.pill.neutral{background:#efedeb;color:#6e6661}
+.uptime-page{max-width:1240px;margin:0 auto}
+.uptime-last-check{margin:-12px 0 18px;color:var(--muted);font-size:12px;text-align:right}
+.uptime-incidents{margin-top:38px}
+.incident-title-row{display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--border);padding-bottom:10px}
+.incident-title-row .section-title{margin:0}
+.incident-list{padding-top:8px}
+.incident-empty{text-align:center;color:#9a918c;padding:45px}
+.runtime-error-main .related-source{padding:9px 11px;background:#fff8e8;border:1px solid #eedba7;border-radius:9px}
+.ai-review-note{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:12px 15px;border:1px solid var(--border);border-radius:11px;margin:0 0 18px;background:#fff}
+.ai-review-note div{display:grid;gap:2px}
+.ai-review-note span{font-size:12px;color:var(--muted)}
+.ai-review-note.complete{border-color:#b9dfd7;background:var(--teal-soft)}
+.ai-review-note.limited{border-color:#ead394;background:#fff8e6}
+.ai-review-note a{font-size:12px;white-space:nowrap}
+
+@media(max-width:760px){
+  .tool-primary-action{align-items:stretch;flex-direction:column;white-space:normal;width:100%}
+  .scan-target{grid-template-columns:minmax(0,1fr) auto}
+  .scan-target input{min-width:0}
+  .runtime-status-banner{align-items:flex-start;flex-direction:column}
+  .runtime-status-banner strong{white-space:normal}
+  .runtime-connect-state{align-items:flex-start;flex-direction:column;border-radius:12px;width:auto}
+  .connect-pr-form p{display:block;margin:8px 0 0}
+  .incident-title-row{align-items:flex-start;flex-direction:column;gap:10px}
+  .ai-review-note{align-items:flex-start;flex-direction:column}
+  .uptime-last-check{text-align:left}
+}

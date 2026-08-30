@@ -1,0 +1,19 @@
+<?php
+$cycleKey=date('Y-m');
+$refCount=(int)(\App\Core\DB::one('SELECT COUNT(*) c FROM referrals WHERE referrer_user_id=? AND status="activated" AND reward_cycle_key=?',[$user['id'],$cycleKey])['c']??0);
+$isPro=($sub['plan_key']??'')==='pro';
+?>
+<div class="account-title"><h1><?=h(t('Billing'))?></h1><p>Manage your subscription and purchase token top-ups.</p></div>
+<div class="billing-card plan-summary"><h2><?=$sub?h($sub['plan_name']):'Free plan'?></h2><?php if($isPro):?><div class="plan-meta"><span><?=h(ucfirst($sub['billing_cycle']))?> billing</span><span>Current period ends <?=h($sub['current_period_end']?:'—')?></span></div><?php endif?></div>
+<?php if(!$isPro):?><div class="billing-card"><h2>Upgrade to Pro</h2><p class="muted">Unlock 10,000 tokens/month, priority scans, and advanced features.</p>
+<form method="post" action="/account/billing/checkout" id="proCheckout"><?=csrf()?><input type="hidden" name="kind" value="pro"><input type="hidden" name="cycle" value="monthly" id="billingCycle">
+<div class="segmented billing-cycle"><button type="button" class="active" data-plan-cycle="monthly" data-price="25">Monthly</button><button type="button" data-plan-cycle="annual" data-price="250">Annual <small>2 months free</small></button></div>
+<div class="price" id="planPrice">$25 <small>/month</small></div><button class="btn coral full-btn">Upgrade to Pro</button></form></div>
+<?php else:?><div class="billing-card"><h2>Pro plan active</h2><p class="muted">Your current Pro subscription is active.</p><form method="post" action="/account/billing/cancel" data-confirm="Cancel your Pro subscription?"><?=csrf()?><button class="btn danger-outline">Cancel Pro</button></form></div><?php endif?>
+
+<div class="billing-card"><h2>Invite peers, earn free tokens</h2><p class="muted">Get +1,000 tokens when a peer completes their first scan. Your peer starts with 1,500 tokens.</p><div class="copy-field"><input id="ref-link" readonly value="<?=h(\App\Core\Util::baseUrl().'/signup?ref='.$user['referral_code'])?>"><button type="button" class="icon-btn" data-copy="ref-link" aria-label="Copy referral link">⧉</button></div><div class="ref-cycle-head"><span>REFERRALS THIS CYCLE</span><span><?=$refCount?> / 5</span></div><div class="referral-progress"><?php for($i=0;$i<5;$i++):?><span class="<?=$i<$refCount?'filled':''?>"></span><?php endfor?></div><a class="btn sm" href="/account/referrals">See all referrals</a></div>
+
+<h2 class="account-section-heading">Token top-ups</h2><p class="muted">Need more tokens? Buy a one-time top-up pack.</p><div class="topup-grid"><?php foreach([[5000,15],[10000,28],[25000,65]] as [$tokens,$price]):?><div class="topup-card"><strong><?=number_format($tokens)?> tokens</strong><div class="price">$<?=$price?></div><div class="muted">$<?=number_format($price/($tokens/1000),1)?>/1K tokens</div><form method="post" action="/account/billing/checkout"><?=csrf()?><input type="hidden" name="kind" value="topup"><input type="hidden" name="tokens" value="<?=$tokens?>"><button class="btn dark full-btn">Buy</button></form></div><?php endforeach?></div>
+
+<h2 class="account-section-heading invoice-heading">Invoices & purchases</h2>
+<div class="billing-card transaction-card"><?php if(!$transactions):?><div class="account-empty">No billing transactions yet.</div><?php else:?><div class="table-scroll"><table class="table"><thead><tr><th>Date</th><th>Description</th><th>Status</th><th>Amount</th></tr></thead><tbody><?php foreach($transactions as $tx):?><tr><td><?=h($tx['created_at'])?></td><td><?=h($tx['description'])?></td><td><span class="tx-status <?=h($tx['status'])?>"><?=h(ucfirst($tx['status']))?></span></td><td>$<?=number_format(((int)$tx['amount_cents'])/100,2)?> <?=h(strtoupper($tx['currency']))?></td></tr><?php endforeach?></tbody></table></div><?php endif?></div>

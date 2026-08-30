@@ -1,11 +1,33 @@
-# This file only matters if the web server's document root is mistakenly
-# pointed at the repository root instead of /public. Deny everything so
-# application source, config and storage are never served directly.
-# The correct Hostinger setup points the domain's document root at /public.
-<IfModule mod_authz_core.c>
-    Require all denied
+DirectoryIndex index.php
+Options -Indexes
+RewriteEngine On
+
+# SIUGOALS cross-origin SDK modules — force through PHP so module CORS headers are always present.
+RewriteRule ^sdk/(launchkit|runtime)\.js$ index.php [QSA,L]
+<IfModule mod_headers.c>
+  <FilesMatch "^(launchkit|runtime)\.js$">
+    Header set Access-Control-Allow-Origin "*"
+    Header set Cross-Origin-Resource-Policy "cross-origin"
+  </FilesMatch>
 </IfModule>
-<IfModule !mod_authz_core.c>
-    Order deny,allow
-    Deny from all
-</IfModule>
+
+# Never expose server-side application internals.
+RewriteRule ^(?:app|database|storage|config|cron|docs)(?:/|$) - [F,L,NC]
+RewriteRule ^(?:\.env|install\.php)$ - [F,L,NC]
+
+# Root request must reach the application even though public_html is a directory.
+RewriteRule ^$ index.php [L]
+
+# Public static assets and the preserved legacy privacy-policy page.
+RewriteRule ^assets/(.*)$ public/assets/$1 [L]
+RewriteRule ^favicon\.ico$ public/favicon.ico [L]
+RewriteRule ^privacy-policy\.html$ public/privacy-policy.html [L]
+
+# Front controller for application routes.
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule ^ index.php [QSA,L]
+
+<FilesMatch "(^\.|\.sql$|\.log$|\.md$)">
+  Require all denied
+</FilesMatch>

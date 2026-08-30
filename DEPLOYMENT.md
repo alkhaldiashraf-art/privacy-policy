@@ -1,103 +1,150 @@
 # Deploying SIUGOALS on Hostinger
 
-## 1. Database
+## 1. Create the database
 
-In hPanel: Databases → MySQL Databases → create a database and a user with
-full privileges on it. Note the host (usually `localhost`), database name,
-username, and password.
+In hPanel: **Databases → MySQL Databases** → create a database and a user
+with full privileges on it. Note the host (usually `localhost`), database
+name, username, and password.
 
-## 2. Files
+Open **phpMyAdmin**, select the new (empty) database, go to **Import**, and
+import `database/siugoals.sql`. This one file creates the complete schema
+plus reference data (plans, quick questions, the migration ledger) — there
+is nothing else to import for a fresh install.
 
-Upload the repository contents to your hosting account (Git deploy, File
-Manager, or FTP). **Point the domain's document root at the `public/`
-directory**, not the repository root — this is required: everything
-outside `public/` (source, config, migrations, storage) must not be
-web-accessible. A root-level `.htaccess` denies all requests as a defense
-in depth if the document root is ever misconfigured, but the correct fix
-is always to set the document root to `public/`.
+## 2. Configure the app
 
-## 3. Environment
-
-Copy `.env.example` to `.env` in the repository root (**not** inside
-`public/`) and fill in:
+Copy `config/config.example.php` to `config/config.php` and edit it:
 
 - `APP_URL` — your real domain, `https://...`
-- `APP_KEY` — generate with `php -r "echo bin2hex(random_bytes(32));"`
-- `APP_DEBUG=false` in production, always
-- `DB_HOST`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` from step 1
-- `SESSION_SECURE_COOKIE=true` (requires HTTPS, which Hostinger provides
-  free via Let's Encrypt — enable it in hPanel first)
+- `APP_KEY` — generate one with `php -r "echo bin2hex(random_bytes(32));"`
+  and paste it in. The app refuses to start while this still begins with
+  `CHANGE_THIS`, so you cannot forget this step.
+- `DB_HOST`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD` from step 1.
 
-Never commit the real `.env` file or put production secrets in the git
-repository.
+Everything else in that file (OAuth, GitHub Apps, OpenAI, Stripe, mail) is
+optional — leave those keys blank and the corresponding feature just stays
+off; the core scanner, Fix Center and Runtime SDK all work without any of
+them.
 
-## 4. Database schema
+**Never commit `config/config.php`** — it's already in `.gitignore` because
+it will hold real secrets once you fill it in. Upload it to your host
+directly (FTP/File Manager), separately from your git history.
 
-**If you have SSH** (Hostinger Business/Cloud plans):
+## 3. Upload the files
 
-```bash
-php database/migrate.php
+You have two options, depending on your Hostinger plan:
+
+**Option A — point the domain's document root at `public/` (recommended
+when your plan allows it).** Upload the whole repository, then in hPanel
+set the domain's document root to the `public/` folder. This keeps `app/`,
+`config/`, `database/`, `storage/`, and `cron/` completely outside the web
+server's reach — the strongest setup, since there's nothing an
+`.htaccess` mistake could ever expose.
+
+**Option B — upload everything into `public_html/` (most basic shared
+hosting plans; you can't change the document root).** Upload the entire
+repository as-is into `public_html`. The root `.htaccess` routes every
+request through `public/index.php` and explicitly denies direct access to
+`app/`, `database/`, `storage/`, `config/`, `cron/`, and any `.sql`/`.log`
+file — but this relies on Apache actually honoring `.htaccess`
+(`AllowOverride All`, which Hostinger enables by default). Option A has no
+such dependency, so prefer it whenever you can.
+
+Either way, make sure `storage/logs/` and `storage/temp/` are writable by
+PHP.
+
+## 4. PHP requirements
+
+Needs `ext-pdo_mysql`, `ext-curl`, and `ext-zip` — all enabled by default
+on Hostinger's PHP builds; verify with `php -m` if something fails.
+
+For the code/ZIP scanner (uploads up to 100 MB), raise `upload_max_filesize`
+and `post_max_size` to at least `100M` under hPanel → Advanced → PHP
+Configuration.
+
+## 5. Schedule the cron jobs (Hostinger → Advanced → Cron Jobs)
+
+| Job | Schedule | Command |
+|---|---|---|
+| Uptime probes | every 5 minutes | `php /home/USER/public_html/cron/uptime.php` |
+| Retention/token cycle maintenance | daily | `php /home/USER/public_html/cron/maintenance.php` |
+| Weekly digest email | weekly | `php /home/USER/public_html/cron/notifications.php` |
+
+Adjust the path to wherever the repository actually lives on your account
+(it's the same regardless of whether you chose option A or B above, since
+these scripts are invoked directly by the PHP CLI, not through the web
+server). Without the uptime cron, Runtime sessions still work, but the
+Uptime chart and incident tracking never update.
+
+## 6. Verify the install
+
+Visit `https://your-domain.com/health` — it should report:
+
+```json
+{"ok": true, "schemaReady": true, "schemaIssues": []}
 ```
 
-Safe to run repeatedly — it only applies migrations that haven't run yet.
+If `schemaIssues` is non-empty, the database import didn't fully complete —
+re-check step 1.
 
-**If you don't have SSH** (plain shared hosting): visit
-`https://yourdomain.com/install` in a browser and click "Run
-installation". This endpoint runs the same migrations, then writes
-`storage/installed.lock` and permanently refuses to run again — there is
-no bypass. If you need to apply new migrations after a future deploy and
-still have no SSH access, that will require a small controlled admin path
-in a later phase; for now, request SSH-enabled hosting or run migrations
-locally against a hosting-accessible DB host.
+Then sign up for an account at `/signup`, create a project, and run a
+Website Scan to confirm the database connection, sessions, and CSRF are
+all working end to end.
 
-## 5. Composer dependencies
+## 7. Make yourself a platform administrator (optional)
 
-The project has zero third-party runtime dependencies, and `vendor/` (just
-Composer's own autoloader) is committed to the repository, so no
-`composer install` step is required to deploy. If a later phase adds a
-real third-party dependency (e.g. a PDF library for the Trust Center), run
-`composer install --no-dev --optimize-autoloader` and re-commit `vendor/`
-before deploying to shared hosting without SSH, or run it on the server
-directly if SSH is available.
+The database ships with **no** default admin account on purpose — a shared
+or well-known credential in a public schema file is a real security risk,
+so there's nothing to remember to change. After you've signed up normally
+through the site, promote your own account with one statement in
+phpMyAdmin's SQL tab:
 
-The scanner does require two standard PHP extensions: `ext-curl` (URL
-scanning and the optional Anthropic API call) and `ext-zip` (extracting
-uploaded project ZIPs). Both are enabled by default on Hostinger's PHP
-builds; verify with `php -m` if a scan fails unexpectedly.
+```sql
+INSERT INTO platform_admins (user_id)
+SELECT id FROM users WHERE email = 'you@example.com';
+```
 
-For the upload scanner, also check `upload_max_filesize` and
-`post_max_size` in your hosting's PHP configuration — they must be at
-least 20M for the largest allowed upload to go through; hPanel exposes
-these under Advanced → PHP Configuration on most plans.
+This unlocks `/admin` (platform-wide stats, users, projects, audit log) for
+that account only.
 
-To get AI-generated fix prompts instead of the template fallback, set
-`ANTHROPIC_API_KEY` (and optionally `ANTHROPIC_MODEL`) in `.env`. This is
-optional — the scanner works without it.
+## 8. Install the Runtime SDK on the monitored app
 
-## 6. Verify
+Each project's **Runtime SDK** tab (`/builds/<slug>/dashboard/connect`)
+shows a copy-paste snippet keyed to that project, e.g.:
 
-- Visit `/` — should show the SIUGOALS placeholder home page.
-- Visit `/privacy-policy.html` — should show the preserved privacy policy
-  that used to be served at the repository root. Update any external
-  registration of that URL (e.g. a Meta App Review listing) if it pointed
-  at the old root path.
-- Sign up for an account, create a project, edit its settings — confirms
-  the database connection, sessions, and CSRF are all working.
+```html
+<script type="module">
+  import('https://your-domain.com/sdk/launchkit.js?v=5.5.0')
+    .then(({ init }) => init({ buildSlug: 'your-project-slug' }))
+    .catch((error) => console.error('[SIUGOALS] SDK failed to start', error));
+</script>
+```
 
-## Runtime SDK endpoint
+Paste it before `</body>` on the monitored site, open that site once, then
+click **Verify** on the Connect page. If verification fails, check
+`window.SIUGOALS_DIAGNOSTICS` in the monitored site's browser console — it
+records exactly which step failed (wrong project key, origin mismatch,
+network error, etc.). If the project's source is on GitHub with the
+Maintenance GitHub App connected, SIUGOALS can instead open a pull request
+that adds the snippet for you — it never edits the repository directly.
 
-`POST /api/collect` is a public, cross-origin endpoint (CORS enabled,
-CSRF-exempt by design) that the embeddable SDK snippet
-(`public/assets/js/sdk.js`, shown on each project's Sessions tab) posts
-to from customer websites. It authenticates requests by a per-project
-public key, not a session cookie — nothing to configure, but be aware it
-is intentionally reachable without login, rate-limited per key+IP. It
-also makes a best-effort outbound HTTPS call to ipapi.co for country
-lookup on new sessions; no key/config needed, and a lookup failure just
-leaves the country unknown rather than failing the request.
+## Optional integrations
 
-## Known limitation for this phase
+All of these are off by default and every core feature works without them:
 
-There is currently no cron/scheduler requirement and no webhook
-configuration needed — those arrive with the uptime engine and GitHub
-integration phases, which are not part of this build yet.
+- **`OPENAI_API_KEY`** — turns on the AI evidence pass for source scans and
+  the overall readiness review (per-finding fix prompts work either way;
+  without a key they're written from a deterministic template instead of
+  the model).
+- **`STRIPE_SECRET_KEY` / `STRIPE_WEBHOOK_SECRET`** — turns on Pro
+  subscriptions, token top-ups, and per-project paid client access via
+  Stripe Connect. Set the webhook endpoint to
+  `https://your-domain.com/webhooks/stripe`.
+- **`GOOGLE_OAUTH_CLIENT_ID/SECRET`, `GITHUB_OAUTH_CLIENT_ID/SECRET`** —
+  "Sign in with Google/GitHub" on the login page.
+- **`GITHUB_APP_ID/SLUG/PRIVATE_KEY_BASE64`** (read-only scanning) and the
+  separate **`GITHUB_MAINT_APP_*`** (SDK-install pull requests) — two
+  distinct GitHub Apps by design, so read access and write access are
+  never granted by the same installation.
+- **`MAIL_ENABLED`, `MAIL_FROM_EMAIL`, `MAIL_FROM_NAME`** — password-reset
+  emails and the weekly digest, sent via PHP's `mail()`.

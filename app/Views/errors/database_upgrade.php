@@ -1,0 +1,11 @@
+<?php
+$issues=array_values(array_unique($schemaUpgradeIssues??[]));
+$needs54=in_array('stage5_4_ai_evidence_scan',$issues,true);
+$needs55=in_array('stage5_5_builder_workflow',$issues,true);
+$coreIssues=array_values(array_filter($issues,static fn($i)=>!in_array($i,['stage5_4_ai_evidence_scan','stage5_5_builder_workflow'],true)));
+?>
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Database upgrade required · SIUGOALS</title><style>body{font-family:Arial,sans-serif;background:#faf6f1;color:#211f20;margin:0}.box{max-width:760px;margin:10vh auto;background:white;border:1px solid #e7dfd8;border-radius:18px;padding:36px}.eyebrow{font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:#d9433f;font-weight:700}h1{font-size:36px;margin:10px 0 14px}code{background:#f4eee8;padding:3px 6px;border-radius:5px}.issues{margin-top:18px;padding:14px 18px;background:#fff5f2;border:1px solid #f4d0c9;border-radius:12px}</style></head><body><div class="box"><div class="eyebrow">Database upgrade required</div><h1>SIUGOALS needs a database patch</h1><p>The application files are running, but the selected database is missing required 5.5 structure. Back up the database first. Never import the complete clean-install schema over an existing database.</p>
+<?php if($coreIssues):?><p>This database is also missing older core structure. Restore the correct 5.4/5.4.1 database backup or complete the earlier upgrade before applying 5.5. Do not add migration-ledger rows until the matching schema changes really exist.</p><?php endif?>
+<?php if($needs54):?><p>Import the included AI evidence upgrade once:</p><p><code>database/SIUGOALS_5_4_AI_EVIDENCE_SCAN_PATCH.sql</code></p><?php endif?>
+<?php if($needs55):?><p>Then import the included 5.5 Builder Workflow upgrade once:</p><p><code>database/SIUGOALS_5_5_BUILDER_WORKFLOW_PATCH.sql</code></p><?php endif?>
+<div class="issues"><strong>Missing:</strong> <?=htmlspecialchars(implode(', ',$issues),ENT_QUOTES,'UTF-8')?></div><p>After the imports finish successfully, open <code>/health</code>. Continue only when <code>schemaReady</code> is true and <code>schemaIssues</code> is empty.</p></div></body></html>

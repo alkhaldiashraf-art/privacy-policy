@@ -1,0 +1,5 @@
+<div class="account-title"><h1><?=h(t('Notifications'))?></h1><p>Choose which emails you receive.</p></div>
+<?php $rows=[['onboarding','Onboarding','Getting-started guides and setup tips'],['weekly_digest','Weekly Digest','Weekly summary of pending actions'],['alerts','Alerts','Repository disconnections, uptime incidents, new client-error alerts, and referral activations.'],['promotional','Promotional','Feature highlights and upgrade suggestions']];foreach($rows as [$key,$name,$desc]):?>
+<div class="notification-row"><div><strong><?=h($name)?></strong><div class="muted"><?=h($desc)?><?php if($key==='alerts'):?> <span class="alert-warning">Disabling may cause you to miss critical alerts.</span><?php endif?></div></div>
+<form method="post" class="toggle-form"><?=csrf()?><input type="hidden" name="preference_key" value="<?=$key?>"><input type="hidden" name="enabled" value="0"><label class="toggle coral-toggle"><input type="checkbox" name="enabled" value="1" data-toggle-submit <?=!empty($pref[$key])?'checked':''?>><span></span></label></form></div>
+<?php endforeach?>

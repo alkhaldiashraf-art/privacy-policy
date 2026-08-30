@@ -1,0 +1,30 @@
+<?php
+$discovery=$_SESSION['public_discovery']??[];
+$discoveryError=$_SESSION['public_discovery_error']??null;unset($_SESSION['public_discovery_error']);
+$builder=(string)($discovery['builder']??'');$hosting=(string)($discovery['hosting']??'');$database=(string)($discovery['database']??'');$ai=(string)($discovery['ai_provider']??'');
+function selectedChoice(string $actual,string $value):string{return strcasecmp($actual,$value)===0?'checked':'';}
+?>
+<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Tell us about your app · SIUGOALS</title><link rel="stylesheet" href="/assets/css/app.css?v=8"></head><body class="public-body"><main class="public-shell audit-question-shell">
+<section class="audit-question-intro"><div class="side-label">PRODUCTION AUDIT · EVIDENCE WE CAN'T SEE FROM THE OUTSIDE</div><h1>Make sure your app is set up for the long run.</h1><p>SIUGOALS already inspected the public URL. Confirm the stack and answer only the things a browser cannot prove.</p><?php if($discoveryError):?><div class="audit-soft-note"><?=h($discoveryError)?></div><?php endif?></section>
+<form method="post" action="/audit/run" class="audit-questionnaire"><?=\App\Core\Csrf::input()?>
+<?php
+$cards=[
+ ['builder','What tool did you build with?',['Lovable','Bolt','Base44','Replit','Claude Code','Cursor','v0','Other','I am not sure'],$builder],
+ ['hosting','Where is the production app hosted?',['Vercel','Netlify','Cloudflare','Render','Railway','Hostinger','Other','I am not sure'],$hosting],
+ ['database','Which database platform does the app use?',['Supabase','Firebase','MySQL','PostgreSQL','MongoDB','Neon','PlanetScale','Other','I am not sure'],$database],
+ ['ai_provider','Does the product use an AI provider?',['OpenAI','Claude','Gemini','DeepSeek','No AI','Other','I am not sure'],$ai],
+];
+foreach($cards as [$name,$question,$options,$detected]):?>
+<section class="audit-question-block"><div class="audit-question-heading"><h2><?=h($question)?></h2><?php if($detected):?><span class="detected-pill">Detected: <?=h($detected)?></span><?php endif?></div><div class="choice-grid audit-choice-grid"><?php foreach($options as $v):?><label class="choice"><input type="radio" name="<?=$name?>" value="<?=h($v)?>" <?=selectedChoice($detected,$v)?>><span><?=h($v)?></span></label><?php endforeach?></div></section>
+<?php endforeach?>
+
+<section class="audit-question-block"><h2>Does your database include automatic backups?</h2><p class="question-help">Check your database provider's plan details.</p><div class="choice-grid audit-choice-grid"><?php foreach(['Yes, backups are included in my plan'=>'yes','No, I do not have automatic backups'=>'no',"I'm not sure"=>'unknown'] as $l=>$v):?><label class="choice"><input type="radio" name="backups" value="<?=$v?>"><span><?=$l?></span></label><?php endforeach?></div></section>
+<section class="audit-question-block"><h2>Does your AI or builder tool give you the commercial ownership rights you need?</h2><div class="choice-grid audit-choice-grid"><?php foreach(['Yes, I have the rights I need'=>'yes','No, there are restrictions'=>'no','Not applicable'=>'na',"I'm not sure"=>'unknown'] as $l=>$v):?><label class="choice"><input type="radio" name="ownership" value="<?=$v?>"><span><?=$l?></span></label><?php endforeach?></div></section>
+<section class="audit-question-block"><h2>Is your app's code saved in GitHub or another version-control service?</h2><div class="choice-grid audit-choice-grid"><?php foreach(['Yes, GitHub'=>'github','Yes, another service'=>'other','No, it only lives in my builder/tool'=>'none',"I'm not sure"=>'unknown'] as $l=>$v):?><label class="choice"><input type="radio" name="source" value="<?=$v?>"><span><?=$l?></span></label><?php endforeach?></div></section>
+<section class="audit-question-block"><h2>Does your app need different permission levels?</h2><div class="choice-grid audit-choice-grid"><?php foreach(['Yes, and roles are already set up'=>'configured','Yes, I still need to set up roles'=>'needed','No, everyone should have the same access'=>'same',"I'm not sure"=>'unknown'] as $l=>$v):?><label class="choice"><input type="radio" name="roles" value="<?=$v?>"><span><?=$l?></span></label><?php endforeach?></div></section>
+<section class="audit-question-block"><h2>Do your AI services have a spending cap?</h2><div class="choice-grid audit-choice-grid"><?php foreach(['Yes, there is a spending cap'=>'yes','No, spending is uncapped'=>'no','Not applicable'=>'na',"I'm not sure"=>'unknown'] as $l=>$v):?><label class="choice"><input type="radio" name="ai_spending_cap" value="<?=$v?>"><span><?=$l?></span></label><?php endforeach?></div></section>
+<section class="audit-question-block"><h2>Can a single user consume unlimited paid resources?</h2><div class="choice-grid audit-choice-grid"><?php foreach(['No, per-user limits are configured'=>'yes','Yes, one user could consume the shared budget'=>'no','Not applicable'=>'na',"I'm not sure"=>'unknown'] as $l=>$v):?><label class="choice"><input type="radio" name="per_user_limits" value="<?=$v?>"><span><?=$l?></span></label><?php endforeach?></div></section>
+<section class="audit-question-block"><h2>Do you have a hosting or infrastructure spending limit?</h2><div class="choice-grid audit-choice-grid"><?php foreach(['Yes'=>'yes','No'=>'no',"I'm not sure"=>'unknown'] as $l=>$v):?><label class="choice"><input type="radio" name="hosting_cost_cap" value="<?=$v?>"><span><?=$l?></span></label><?php endforeach?></div></section>
+<section class="audit-question-block"><h2>Do you already use production monitoring?</h2><div class="choice-grid audit-choice-grid"><?php foreach(['Yes'=>'yes','No'=>'no',"I'm not sure"=>'unknown'] as $l=>$v):?><label class="choice"><input type="radio" name="monitoring" value="<?=$v?>"><span><?=$l?></span></label><?php endforeach?></div></section>
+<div class="audit-question-submit"><button class="btn yellow">Run inspection →</button><small>No destructive tests. We only inspect public evidence and the answers you provide.</small></div>
+</form></main></body></html>

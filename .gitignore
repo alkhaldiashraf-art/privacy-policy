@@ -1,8 +1,7 @@
-/.env
+/config/config.php
 /storage/logs/*.log
-/storage/installed.lock
-/storage/cache/*
+/storage/temp/*
 !/storage/logs/.gitkeep
-!/storage/cache/.gitkeep
+!/storage/temp/.gitkeep
 .DS_Store
 Thumbs.db
