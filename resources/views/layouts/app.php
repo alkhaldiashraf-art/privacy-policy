@@ -29,6 +29,8 @@ $project = $project ?? null;
             <?php if ($project): ?>
                 <div class="sidebar-section-label">Project</div>
                 <a class="sidebar-link <?= $activeNav === 'overview' ? 'active' : '' ?>" href="/projects/<?= (int) $project['id'] ?>">Overview</a>
+                <a class="sidebar-link <?= $activeNav === 'scan' ? 'active' : '' ?>" href="/projects/<?= (int) $project['id'] ?>/scan">Scan</a>
+                <a class="sidebar-link <?= $activeNav === 'sessions' ? 'active' : '' ?>" href="/projects/<?= (int) $project['id'] ?>/sessions">Sessions</a>
                 <a class="sidebar-link <?= $activeNav === 'settings' ? 'active' : '' ?>" href="/projects/<?= (int) $project['id'] ?>/settings">Settings</a>
             <?php endif; ?>
 

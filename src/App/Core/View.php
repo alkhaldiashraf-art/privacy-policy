@@ -29,4 +29,18 @@ final class View
     {
         return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
     }
+
+    /** Renders a 2-letter ISO country code as its flag emoji (regional indicator symbols), or '—' if unknown. */
+    public static function flag(?string $countryCode): string
+    {
+        if ($countryCode === null || !preg_match('/^[A-Za-z]{2}$/', $countryCode)) {
+            return '—';
+        }
+        $code = strtoupper($countryCode);
+        $flag = '';
+        for ($i = 0; $i < 2; $i++) {
+            $flag .= mb_chr(0x1F1E6 + (ord($code[$i]) - 65), 'UTF-8');
+        }
+        return $flag;
+    }
 }

@@ -61,6 +61,16 @@ final class Request
         return array_merge($this->query, $this->body);
     }
 
+    /** @return array{name:string,type:string,tmp_name:string,error:int,size:int}|null */
+    public function file(string $key): ?array
+    {
+        $file = $_FILES[$key] ?? null;
+        if (!is_array($file) || !isset($file['error']) || $file['error'] === UPLOAD_ERR_NO_FILE) {
+            return null;
+        }
+        return $file;
+    }
+
     public function ip(): string
     {
         $remote = $this->server['REMOTE_ADDR'] ?? '0.0.0.0';
