@@ -69,6 +69,19 @@ listed feature is backed by real server-side logic and a real database.
   Anthropic API from the real finding data; with no key configured, the
   scan still runs and prompts fall back to a clearly-labelled
   deterministic template instead of silently pretending to be AI-written.
+- **Runtime SDK (MVP)**: a project's Sessions tab shows a real embed
+  snippet (`public/assets/js/sdk.js`) keyed to that project's own public
+  key. Once embedded, it reports real sessions (device/browser/OS,
+  best-effort country via a live IP lookup, duration), uncaught
+  JS errors and unhandled promise rejections (with stack traces), and
+  custom `siugoals.track()`/`siugoals.identify()` calls, to a public,
+  rate-limited, CORS-enabled ingestion endpoint (`POST /api/collect`) —
+  authenticated by the per-project public key rather than a session
+  cookie, the same trust model Segment/Sentry/GA use for their collection
+  endpoints. Every captured runtime error gets the same real fix-prompt
+  treatment (AI-generated or template-fallback) as the code scanner's
+  findings. This is a session/error/signal list, not full session replay
+  or DOM recording — see below for what's still not built.
 
 ## What is intentionally NOT built yet
 
@@ -82,8 +95,8 @@ missing feature that's been faked in the UI:
 - Evidence engine / readiness checks / readiness score / findings drawer
   / quick questions / recheck engine
 - Trust Center, public trust pages, PDF reports, certificates
-- Runtime SDK, heartbeats, uptime monitoring, error monitoring, session
-  replay
+- Uptime monitoring, full session replay/DOM recording, "Signals"/"More"
+  filter menus, bulk session actions, multi-tenant SDK key rotation
 - Clients / paid access, billing, usage tracking, referrals,
   notifications
 - AI agents and maintenance-mode repo write access

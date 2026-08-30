@@ -84,8 +84,20 @@ optional — the scanner works without it.
 - Sign up for an account, create a project, edit its settings — confirms
   the database connection, sessions, and CSRF are all working.
 
+## Runtime SDK endpoint
+
+`POST /api/collect` is a public, cross-origin endpoint (CORS enabled,
+CSRF-exempt by design) that the embeddable SDK snippet
+(`public/assets/js/sdk.js`, shown on each project's Sessions tab) posts
+to from customer websites. It authenticates requests by a per-project
+public key, not a session cookie — nothing to configure, but be aware it
+is intentionally reachable without login, rate-limited per key+IP. It
+also makes a best-effort outbound HTTPS call to ipapi.co for country
+lookup on new sessions; no key/config needed, and a lookup failure just
+leaves the country unknown rather than failing the request.
+
 ## Known limitation for this phase
 
 There is currently no cron/scheduler requirement and no webhook
-configuration needed — those arrive with the runtime SDK, uptime engine,
-and GitHub integration phases, which are not part of this build yet.
+configuration needed — those arrive with the uptime engine and GitHub
+integration phases, which are not part of this build yet.

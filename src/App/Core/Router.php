@@ -36,14 +36,45 @@ final class Router
         ];
     }
 
+    /**
+     * Path prefixes that are called cross-origin, from arbitrary customer
+     * websites embedding the runtime SDK — not from our own session-backed
+     * pages. Session cookies (and therefore CSRF tokens) don't apply to
+     * them; they authenticate instead with a per-project public key
+     * checked inside the controller, the same model third-party analytics
+     * SDKs (Segment, Sentry, GA) use for their collection endpoints.
+     */
+    private const CSRF_EXEMPT_PREFIXES = ['/api/'];
+
+    private function isCsrfExempt(string $path): bool
+    {
+        foreach (self::CSRF_EXEMPT_PREFIXES as $prefix) {
+            if (str_starts_with($path, $prefix)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function dispatch(Request $request): void
     {
-        Config::sendSecurityHeaders();
-
         $method = $request->method();
         $path = $request->path();
 
-        if ($request->isPost() && !Csrf::verify($request->string('_csrf'))) {
+        // Cross-origin preflight for the public SDK ingestion endpoint.
+        // Handled before security headers/CSRF, which don't apply to it.
+        if ($method === 'OPTIONS' && $this->isCsrfExempt($path)) {
+            header('Access-Control-Allow-Origin: *');
+            header('Access-Control-Allow-Methods: POST, OPTIONS');
+            header('Access-Control-Allow-Headers: Content-Type');
+            header('Access-Control-Max-Age: 600');
+            http_response_code(204);
+            return;
+        }
+
+        Config::sendSecurityHeaders();
+
+        if ($request->isPost() && !$this->isCsrfExempt($path) && !Csrf::verify($request->string('_csrf'))) {
             http_response_code(419);
             $viewFile = BASE_PATH . '/resources/views/errors/419.php';
             if (is_file($viewFile)) {

@@ -459,6 +459,122 @@ p {
     resize: vertical;
 }
 
+/* Sessions / runtime SDK */
+.sessions-filter-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+}
+
+.sessions-filter-bar input[type="text"] {
+    flex: 1;
+    min-width: 200px;
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-control);
+    font-family: var(--font-body);
+    font-size: 14px;
+}
+
+.filter-select {
+    padding: 10px 12px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-control);
+    font-family: var(--font-body);
+    font-size: 14px;
+    background: #fff;
+}
+
+.sessions-table .session-row-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: var(--color-text);
+}
+
+.avatar-dot {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 999px;
+    background: var(--color-danger-soft);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.activity-bar {
+    display: inline-block;
+    height: 8px;
+    width: 100%;
+    max-width: 120px;
+    border-radius: 4px;
+    background: var(--color-pending);
+    position: relative;
+}
+
+.activity-bar::before {
+    content: "";
+    display: block;
+    height: 100%;
+    border-radius: 4px;
+    background: var(--color-danger-soft);
+}
+
+.activity-bar-0::before { width: 0%; }
+.activity-bar-1::before { width: 10%; }
+.activity-bar-2::before { width: 20%; }
+.activity-bar-3::before { width: 30%; }
+.activity-bar-4::before { width: 40%; }
+.activity-bar-5::before { width: 50%; }
+.activity-bar-6::before { width: 60%; }
+.activity-bar-7::before { width: 70%; }
+.activity-bar-8::before { width: 80%; }
+.activity-bar-9::before { width: 90%; }
+.activity-bar-10::before { width: 100%; }
+
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 16px;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.pagination-links {
+    display: flex;
+    gap: 8px;
+}
+
+.session-meta-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+    margin-bottom: 20px;
+}
+
+.identity-form {
+    max-width: 420px;
+    border-top: 1px solid var(--color-border);
+    padding-top: 16px;
+}
+
+.stack-trace {
+    background: var(--color-bg);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-control);
+    padding: 12px;
+    font-size: 12px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+}
+
 @media (max-width: 860px) {
     .app-shell {
         flex-direction: column;

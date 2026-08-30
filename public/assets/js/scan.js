@@ -14,7 +14,7 @@
 
     document.querySelectorAll('.copy-btn').forEach(function (button) {
         button.addEventListener('click', function () {
-            var card = button.closest('.finding-card');
+            var card = button.closest('.copy-group');
             var textarea = card ? card.querySelector('.fix-prompt-text') : null;
             if (!textarea) {
                 return;

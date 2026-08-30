@@ -41,7 +41,7 @@ foreach ($findings as $f) {
         <p><?= View::e($scan['summary']) ?></p>
 
         <?php if (!empty($scan['comprehensive_fix_prompt'])): ?>
-            <div class="finding-card">
+            <div class="finding-card copy-group">
                 <div class="finding-head">
                     <h3>Comprehensive fix prompt</h3>
                     <span class="badge badge-source-<?= View::e($scan['comprehensive_fix_prompt_source']) ?>">
@@ -64,7 +64,7 @@ foreach ($findings as $f) {
         </div>
     <?php else: ?>
         <?php foreach ($findings as $finding): ?>
-            <div class="card finding-card">
+            <div class="card finding-card copy-group">
                 <div class="finding-head">
                     <span class="badge badge-severity-<?= View::e($finding['severity']) ?>"><?= View::e(ucfirst($finding['severity'])) ?></span>
                     <h3><?= View::e($finding['title']) ?></h3>

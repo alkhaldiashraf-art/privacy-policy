@@ -8,6 +8,8 @@ use App\Controllers\HomeController;
 use App\Controllers\InstallController;
 use App\Controllers\ProjectController;
 use App\Controllers\ScanController;
+use App\Controllers\SdkController;
+use App\Controllers\SessionsController;
 use App\Core\Router;
 
 $router = new Router();
@@ -35,5 +37,11 @@ $router->get('/projects/{id}/scan', [ScanController::class, 'newScan']);
 $router->post('/projects/{id}/scan/url', [ScanController::class, 'runUrlScan']);
 $router->post('/projects/{id}/scan/upload', [ScanController::class, 'runUploadScan']);
 $router->get('/scans/{id}', [ScanController::class, 'show']);
+
+$router->get('/projects/{id}/sessions', [SessionsController::class, 'index']);
+$router->get('/projects/{id}/sessions/{sessionId}', [SessionsController::class, 'show']);
+$router->post('/projects/{id}/sessions/{sessionId}/identity', [SessionsController::class, 'updateIdentity']);
+
+$router->post('/api/collect', [SdkController::class, 'collect']);
 
 return $router;
