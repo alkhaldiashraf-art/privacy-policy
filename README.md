@@ -107,12 +107,23 @@ yet" rather than showing empty/fake versions of these.
 
 ## Preserved from the previous repository state
 
-This repo previously contained a single static `index.html` — a privacy
-policy page for an unrelated Meta/WhatsApp-integration app owned by
-Ashraf Suhel Alkhaldi. That content is preserved and still served, now at
-`/privacy-policy.html` (the document root moves to `public/` — see
-`DEPLOYMENT.md`). If that URL is registered anywhere (e.g. a Meta App
+This repo previously contained a single static `index.html` at the
+repository root — a privacy policy page for an unrelated
+Meta/WhatsApp-integration app owned by Ashraf Suhel Alkhaldi. That
+content is preserved and still served, now at `/privacy-policy.html`
+inside `public/`. If that URL is registered anywhere (e.g. a Meta App
 Review privacy policy URL), update it to point at the new path.
+
+The root-level `index.html` itself has been deleted (identical content
+now lives only at `public/privacy-policy.html`). It was a real
+deployment hazard: on a host where the document root ends up pointing at
+the repository root instead of `public/` (see `DEPLOYMENT.md`), Apache's
+default `DirectoryIndex` serves `index.html` before `index.php` — so
+visitors would silently see the old static privacy policy instead of the
+app, with no error to signal the misconfiguration. Removing the file
+means a misconfigured document root now falls through to the root
+`.htaccess`'s `Require all denied` (an explicit, diagnosable 403) instead
+of quietly serving stale content.
 
 ## Local development
 
