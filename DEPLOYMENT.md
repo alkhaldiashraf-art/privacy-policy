@@ -9,12 +9,48 @@ username, and password.
 ## 2. Files
 
 Upload the repository contents to your hosting account (Git deploy, File
-Manager, or FTP). **Point the domain's document root at the `public/`
-directory**, not the repository root — this is required: everything
-outside `public/` (source, config, migrations, storage) must not be
-web-accessible. A root-level `.htaccess` denies all requests as a defense
-in depth if the document root is ever misconfigured, but the correct fix
-is always to set the document root to `public/`.
+Manager, or FTP), using whichever of these two layouts matches what your
+plan allows. Everything outside `public/` (source, config, migrations,
+storage) must never be web-accessible — that's the point of both options
+below. `public/index.php` auto-detects which layout is in use; no code
+changes are needed either way.
+
+**Option A — you can change the domain's Document Root** (Business/Cloud
+plans, most VPS): upload the repository as-is, then point the domain's
+Document Root at its `public/` folder. A root-level `.htaccess` denies
+all requests as defense in depth if the document root is ever pointed at
+the repository root by mistake — if you see a 403 "Access to this
+resource on the server is denied" page, that's this safeguard telling you
+the document root is wrong, not an application error.
+
+**Option B — your plan fixes Document Root to `public_html`** (common on
+single-site/shared plans, where there is no per-domain document root
+setting to change): you cannot point `public_html` at a subfolder, so
+instead:
+
+```
+home/                     (your hosting account's home directory)
+├── app/                  ← src/, routes/, database/, resources/,
+│                           storage/, vendor/, composer.json,
+│                           composer.lock, .env  (NOT web-accessible)
+└── public_html/          ← Document Root (fixed by the host)
+    ├── index.php         ← copied from public/index.php
+    ├── .htaccess         ← copied from public/.htaccess
+    ├── assets/           ← copied from public/assets/
+    └── privacy-policy.html
+```
+
+Copy `public/`'s *contents* (not the folder itself) directly into
+`public_html`, and put everything else in a sibling folder named exactly
+`app`, next to `public_html` — not inside it. `index.php` looks for
+`src/bootstrap.php` one level above itself first (Option A layout); if
+that's not there, it looks in a sibling `app/` folder next to whatever
+directory it's actually running from (Option B layout) and uses whichever
+it finds. If your File Manager shows `public_html/public/...` after
+uploading, you've uploaded the whole repo into `public_html` — move
+`public_html/public/`'s contents up into `public_html/` itself, then move
+everything else in `public_html` into a new `app/` folder in the home
+directory (one level above `public_html`).
 
 ## 3. Environment
 
